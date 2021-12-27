@@ -79,7 +79,7 @@ endif ()
 find_package(OpenGL REQUIRED)  # apt install freeglut3-dev
 find_library(OPENAL_LIBRARY NAMES openal OpenAL OpenAL32)  # apt install libopenal-dev
 find_library(GLUT_LIBRARY NAMES glut GLUT glut64)  # apt install freeglut3-dev
-# target_link_libraries(helloworldsdk3 ${OPENGL_LIBRARIES} ${OPENAL_LIBRARY} ${GLUT_LIBRARY})
+# target_link_libraries(xp11windowapisample ${OPENGL_LIBRARIES} ${OPENAL_LIBRARY} ${GLUT_LIBRARY})
 
 
 # Link X-Plane plugin system libraries. They are only provided for OS X and Windows.
@@ -87,7 +87,7 @@ if (WIN32 OR APPLE)
 # if (WIN32)
     find_library(XPLM_LIBRARY NAMES XPLM XPLM_64.lib)
 	find_library(XPWIDGETS_LIBRARY NAMES XPWidgets XPWidgets_64.lib)
-    target_link_libraries(helloworldsdk3 ${XPLM_LIBRARY} ${XPWIDGETS_LIBRARY})
+    target_link_libraries(xp11windowapisample ${XPLM_LIBRARY} ${XPWIDGETS_LIBRARY})
 endif ()
 
 
