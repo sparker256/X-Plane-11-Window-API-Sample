@@ -62,7 +62,7 @@ add_compile_options(-O3 -fPIC)
 
 # X-Plane plugin
 # FIXME: Split this into individual targets.
-list(APPEND XP11WINDOWAPISAMPLE_SRCS Hello-World-SDK-3.cpp)
+list(APPEND XP11WINDOWAPISAMPLE_SRCS X-Plane-11-Window-API-Sample.cpp)
 
 add_library(xp11windowapisample SHARED ${XP11WINDOWAPISAMPLE_SRCS})
 
