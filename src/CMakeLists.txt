@@ -6,7 +6,7 @@
 #   * -DCREATECOMPLETEEDITION=XXX, where XXX is true or false. Default is true.
 
 cmake_minimum_required(VERSION 3.9)
-project(xp11windowapisample VERSION 1.1.9 DESCRIPTION "xp11windowapisample X-Plane plugin")
+project(plugin VERSION 1.1.9 DESCRIPTION "X-Plane 11 Window API Sample Plugin")
 
 # X-Plane supports OS X 10.10+, so this should ensure FlyWithLua can run on
 # all supported versions.
@@ -62,24 +62,24 @@ add_compile_options(-O3 -fPIC)
 
 # X-Plane plugin
 # FIXME: Split this into individual targets.
-list(APPEND XP11WINDOWAPISAMPLE_SRCS X-Plane-11-Window-API-Sample.cpp)
+list(APPEND PLUGIN_SRCS X-Plane-11-Window-API-Sample.cpp)
 
-add_library(xp11windowapisample SHARED ${XP11WINDOWAPISAMPLE_SRCS})
+add_library(plugin SHARED ${PLUGIN_SRCS})
 
-target_compile_features(xp11windowapisample PUBLIC cxx_std_11)
+target_compile_features(plugin PUBLIC cxx_std_11)
 
 if (APPLE)
     # X-Plane 12 supports OS X 11.3+, so this should ensure FlyWithLua can run on
     # all supported versions.
-    target_compile_options(xp11windowapisample PUBLIC -mmacosx-version-min=11.3)
-    target_link_libraries(xp11windowapisample -mmacosx-version-min=11.3)
+    target_compile_options(plugin PUBLIC -mmacosx-version-min=11.3)
+    target_link_libraries(plugin -mmacosx-version-min=11.3)
 endif ()
 
 # Link OpenGL and OpenAL related libraries.
 find_package(OpenGL REQUIRED)  # apt install freeglut3-dev
 find_library(OPENAL_LIBRARY NAMES openal OpenAL OpenAL32)  # apt install libopenal-dev
 find_library(GLUT_LIBRARY NAMES glut GLUT glut64)  # apt install freeglut3-dev
-# target_link_libraries(xp11windowapisample ${OPENGL_LIBRARIES} ${OPENAL_LIBRARY} ${GLUT_LIBRARY})
+# target_link_libraries(plugin ${OPENGL_LIBRARIES} ${OPENAL_LIBRARY} ${GLUT_LIBRARY})
 
 
 # Link X-Plane plugin system libraries. They are only provided for OS X and Windows.
@@ -87,14 +87,14 @@ if (WIN32 OR APPLE)
 # if (WIN32)
     find_library(XPLM_LIBRARY NAMES XPLM XPLM_64.lib)
 	find_library(XPWIDGETS_LIBRARY NAMES XPWidgets XPWidgets_64.lib)
-    target_link_libraries(xp11windowapisample ${XPLM_LIBRARY} ${XPWIDGETS_LIBRARY})
+    target_link_libraries(plugin ${XPLM_LIBRARY} ${XPWIDGETS_LIBRARY})
 endif ()
 
 
 # Link library for dynamic loading of shared objects on UNIX systems.
 if (UNIX)
     find_library(DL_LIBRARY dl)
-    target_link_libraries(xp11windowapisample ${DL_LIBRARY})
+    target_link_libraries(plugin ${DL_LIBRARY})
 endif ()
 
 # Link OS X core system libraries.
@@ -105,37 +105,37 @@ if (APPLE)
     find_library(OpenGL_LIBRARY OpenGL)
     find_library(Cocoa_LIBRARY Cocoa)
 
-    target_link_libraries(xp11windowapisample ${IOKIT_LIBRARY} ${CORE_FOUNDATION_LIBRARY} ${GLUT_LIBRARY})
-    target_link_libraries(xp11windowapisample ${OpenGL_LIBRARY} ${Cocoa_LIBRARY})
+    target_link_libraries(plugin ${IOKIT_LIBRARY} ${CORE_FOUNDATION_LIBRARY} ${GLUT_LIBRARY})
+    target_link_libraries(plugin ${OpenGL_LIBRARY} ${Cocoa_LIBRARY})
 endif ()
 
 if (WIN32)
     # Unlike OS X and Linux we build standard libraries statically since X-Plane does not provide them.
-    target_link_libraries(xp11windowapisample -static-libgcc -static-libstdc++ opengl32)
+    target_link_libraries(plugin -static-libgcc -static-libstdc++ opengl32)
     # MSYS2 for some reason always links against winpthread, so we have to work around it by statically linking the
     # entire plugin. This allows building the plugin nativaly on Windows.
-    target_link_libraries(xp11windowapisample -static)
+    target_link_libraries(plugin -static)
 elseif (APPLE)
     # Restrict set of symbols exported from the plugin. This reduces changes of
     # conflict with other plugins, in particular ones with Lua interpreter
     # embedded.
-    target_link_libraries(xp11windowapisample "-exported_symbols_list ${CMAKE_SOURCE_DIR}/xplane11_window_api_sample.sym_mac")
-	target_link_libraries(xp11windowapisample "-framework XPLM -framework XPWidgets -ldl")
+    target_link_libraries(plugin "-exported_symbols_list ${CMAKE_SOURCE_DIR}/exports.sym_mac")
+	target_link_libraries(plugin "-framework XPLM -framework XPWidgets -ldl")
 elseif (UNIX)
     # Specify additional runtime search laths for dynamically-linked libraries.
     # Restrict set of symbols exported from the plugin. This reduces changes of
     # conflict with other plugins, in particular ones with Lua interpreter
     # embedded.
-    target_link_libraries(xp11windowapisample -Wl,--version-script -Wl,${CMAKE_SOURCE_DIR}/xplane11_window_api_sample.sym)
+    target_link_libraries(plugin -Wl,--version-script -Wl,${CMAKE_SOURCE_DIR}/exports.txt)
 endif ()
 
 
-set_target_properties(xp11windowapisample PROPERTIES PREFIX "")
+set_target_properties(plugin PROPERTIES PREFIX "")
 if (WIN32)
-    set_target_properties(xp11windowapisample PROPERTIES OUTPUT_NAME "win")
+    set_target_properties(plugin PROPERTIES OUTPUT_NAME "win")
 elseif (APPLE)
-    set_target_properties(xp11windowapisample PROPERTIES OUTPUT_NAME "mac")
+    set_target_properties(plugin PROPERTIES OUTPUT_NAME "mac")
 elseif (UNIX)
-    set_target_properties(xp11windowapisample PROPERTIES OUTPUT_NAME "lin")
+    set_target_properties(plugin PROPERTIES OUTPUT_NAME "lin")
 endif ()
-set_target_properties(xp11windowapisample PROPERTIES SUFFIX ".xpl")
+set_target_properties(plugin PROPERTIES SUFFIX ".xpl")
